@@ -1,0 +1,21 @@
+# datasets — restored by the prepare_*.py scripts, never committed
+# (Laboro Tomato is CC BY-NC-SA 4.0; do not redistribute)
+data/
+*.zip
+
+# cloned upstream repositories (see README for the clone command)
+repo/
+
+# training artefacts
+runs/
+*.pt
+*.log
+
+# environments
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# os
+.DS_Store
