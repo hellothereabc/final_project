@@ -1,0 +1,35 @@
+name: TomatoRipeness
+options:
+  bundleIdPrefix: com.dvk
+  deploymentTarget:
+    iOS: "17.0"
+
+targets:
+  TomatoRipeness:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      # .mlpackage belongs in Compile Sources, not Resources: Xcode's CoreML
+      # compiler turns it into TomatoRipeness.mlmodelc inside the bundle. Listed
+      # as a plain resource it is copied verbatim and the device build finds no
+      # model at runtime.
+      - path: Resources/TomatoRipeness.mlpackage
+      - path: Resources/samples
+        buildPhase: resources
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.dvk.TomatoRipeness
+        # Device builds: automatic signing against the Apple ID signed into Xcode.
+        DEVELOPMENT_TEAM: 2RMDSWB55Z
+        CODE_SIGN_STYLE: Automatic
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        INFOPLIST_KEY_CFBundleDisplayName: Tomato Ripeness
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Pick a photo to count tomatoes in it.
+        INFOPLIST_KEY_NSCameraUsageDescription: Point the camera at tomatoes to count them live.
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        SWIFT_VERSION: "5.0"
