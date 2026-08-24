@@ -1,0 +1,372 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		003A9C14FDD926B5898B8E43 /* sample1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0CFB27E95AE8828BC6735401 /* sample1.jpg */; };
+		02AB6BBAD1C5E87B7507AC74 /* sample3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 349DBD89E10A3360ED346C83 /* sample3.jpg */; };
+		1FF79377A7B4A6A0A87B9A44 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03EB7194516330FC458A2E13 /* CameraController.swift */; };
+		4331ACBAF03A028D20C69C74 /* TomatoRipeness.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F7393902F1B3699DACDB0D38 /* TomatoRipeness.mlpackage */; };
+		6215F653A00FB9AD031255FC /* BenchmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16BD792E57E1B83806B9990F /* BenchmarkView.swift */; };
+		6ED27317BB8A80E3B2281D53 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 812FBE462A34C655E28D3453 /* ContentView.swift */; };
+		86A7DB1A11676A01E8538A50 /* sample2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 63ED53B304FD8DE0D72272CB /* sample2.jpg */; };
+		B1D65A88F77E9BC38F358582 /* TomatoRipenessApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B545F8592620F3F81B7E2A /* TomatoRipenessApp.swift */; };
+		E3D76A493E705FA6A4DF4391 /* Detector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD613FAB26F57F2219B262F7 /* Detector.swift */; };
+		EABD92C287AAEA930F1F919D /* CameraScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2E975A6F3B75F9D4665B246 /* CameraScreen.swift */; };
+		EE2C3918D62AB99E90D95EA9 /* BoxOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5B63D6B0A9E572AE65699B /* BoxOverlay.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		03EB7194516330FC458A2E13 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
+		0CFB27E95AE8828BC6735401 /* sample1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = sample1.jpg; sourceTree = "<group>"; };
+		16BD792E57E1B83806B9990F /* BenchmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenchmarkView.swift; sourceTree = "<group>"; };
+		30B545F8592620F3F81B7E2A /* TomatoRipenessApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TomatoRipenessApp.swift; sourceTree = "<group>"; };
+		349DBD89E10A3360ED346C83 /* sample3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = sample3.jpg; sourceTree = "<group>"; };
+		63ED53B304FD8DE0D72272CB /* sample2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = sample2.jpg; sourceTree = "<group>"; };
+		6C3E115EF231CA5EE01107E1 /* TomatoRipeness.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TomatoRipeness.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		812FBE462A34C655E28D3453 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C2E975A6F3B75F9D4665B246 /* CameraScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraScreen.swift; sourceTree = "<group>"; };
+		CD613FAB26F57F2219B262F7 /* Detector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Detector.swift; sourceTree = "<group>"; };
+		DB5B63D6B0A9E572AE65699B /* BoxOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxOverlay.swift; sourceTree = "<group>"; };
+		F7393902F1B3699DACDB0D38 /* TomatoRipeness.mlpackage */ = {isa = PBXFileReference; path = TomatoRipeness.mlpackage; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0E5266BA976C378D760C0BBB = {
+			isa = PBXGroup;
+			children = (
+				9E0CA22B6A8708E21CD5D80A /* Resources */,
+				3E383BE7EFECDE3662C115F2 /* samples */,
+				99083D5CDED8442A22C64838 /* Sources */,
+				EA6C861DFA46B37567FDF608 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3E383BE7EFECDE3662C115F2 /* samples */ = {
+			isa = PBXGroup;
+			children = (
+				0CFB27E95AE8828BC6735401 /* sample1.jpg */,
+				63ED53B304FD8DE0D72272CB /* sample2.jpg */,
+				349DBD89E10A3360ED346C83 /* sample3.jpg */,
+			);
+			name = samples;
+			path = Resources/samples;
+			sourceTree = "<group>";
+		};
+		99083D5CDED8442A22C64838 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				16BD792E57E1B83806B9990F /* BenchmarkView.swift */,
+				DB5B63D6B0A9E572AE65699B /* BoxOverlay.swift */,
+				03EB7194516330FC458A2E13 /* CameraController.swift */,
+				C2E975A6F3B75F9D4665B246 /* CameraScreen.swift */,
+				812FBE462A34C655E28D3453 /* ContentView.swift */,
+				CD613FAB26F57F2219B262F7 /* Detector.swift */,
+				30B545F8592620F3F81B7E2A /* TomatoRipenessApp.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		9E0CA22B6A8708E21CD5D80A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F7393902F1B3699DACDB0D38 /* TomatoRipeness.mlpackage */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		EA6C861DFA46B37567FDF608 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6C3E115EF231CA5EE01107E1 /* TomatoRipeness.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C114683783DA8895949EB399 /* TomatoRipeness */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E7DD32985CC58ED5F30FF498 /* Build configuration list for PBXNativeTarget "TomatoRipeness" */;
+			buildPhases = (
+				22A3022DE9EEA992D6E15BA2 /* Sources */,
+				3D6123E6ABDA5ECAC2A4F3C9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TomatoRipeness;
+			packageProductDependencies = (
+			);
+			productName = TomatoRipeness;
+			productReference = 6C3E115EF231CA5EE01107E1 /* TomatoRipeness.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2C8D20918E6CF727088478C5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					C114683783DA8895949EB399 = {
+						DevelopmentTeam = 2RMDSWB55Z;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 79903AEDF3A44EBE4F6081BF /* Build configuration list for PBXProject "TomatoRipeness" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 0E5266BA976C378D760C0BBB;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = EA6C861DFA46B37567FDF608 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C114683783DA8895949EB399 /* TomatoRipeness */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3D6123E6ABDA5ECAC2A4F3C9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				003A9C14FDD926B5898B8E43 /* sample1.jpg in Resources */,
+				86A7DB1A11676A01E8538A50 /* sample2.jpg in Resources */,
+				02AB6BBAD1C5E87B7507AC74 /* sample3.jpg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		22A3022DE9EEA992D6E15BA2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6215F653A00FB9AD031255FC /* BenchmarkView.swift in Sources */,
+				EE2C3918D62AB99E90D95EA9 /* BoxOverlay.swift in Sources */,
+				1FF79377A7B4A6A0A87B9A44 /* CameraController.swift in Sources */,
+				EABD92C287AAEA930F1F919D /* CameraScreen.swift in Sources */,
+				6ED27317BB8A80E3B2281D53 /* ContentView.swift in Sources */,
+				E3D76A493E705FA6A4DF4391 /* Detector.swift in Sources */,
+				4331ACBAF03A028D20C69C74 /* TomatoRipeness.mlpackage in Sources */,
+				B1D65A88F77E9BC38F358582 /* TomatoRipenessApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		077750063608A828C9533109 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		94112601DAD878E81CD8B326 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2RMDSWB55Z;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Tomato Ripeness";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Point the camera at tomatoes to count them live.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Pick a photo to count tomatoes in it.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dvk.TomatoRipeness;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A7D927D39F2F4293F9573849 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2RMDSWB55Z;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Tomato Ripeness";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Point the camera at tomatoes to count them live.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Pick a photo to count tomatoes in it.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dvk.TomatoRipeness;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CFDCAA249DB6ADD4FDF3F895 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		79903AEDF3A44EBE4F6081BF /* Build configuration list for PBXProject "TomatoRipeness" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				077750063608A828C9533109 /* Debug */,
+				CFDCAA249DB6ADD4FDF3F895 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E7DD32985CC58ED5F30FF498 /* Build configuration list for PBXNativeTarget "TomatoRipeness" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A7D927D39F2F4293F9573849 /* Debug */,
+				94112601DAD878E81CD8B326 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2C8D20918E6CF727088478C5 /* Project object */;
+}

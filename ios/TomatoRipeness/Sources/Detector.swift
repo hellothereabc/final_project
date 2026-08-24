@@ -34,7 +34,13 @@ final class Detector {
     /// Class names in the order the model declares them, for stable UI ordering.
     let labels: [String]
 
-    init() throws {
+    /// Which compute units this instance was built with, for the benchmark screen.
+    let computeUnits: MLComputeUnits
+
+    /// `computeUnits` defaults to the only setting known to work on both targets;
+    /// BenchmarkView passes the others deliberately, one detector each, because
+    /// the choice is fixed at load time and cannot be changed per request.
+    init(computeUnits: MLComputeUnits = .cpuOnly) throws {
         guard let url = Self.findCompiledModel() else { throw DetectorError.modelMissing }
 
         let config = MLModelConfiguration()
@@ -45,9 +51,10 @@ final class Detector {
         //   device    — `MPSGraphExecutable.mm: failed assertion 'MLIR pass manager
         //               failed'`, which traps as EXC_BREAKPOINT inside handler.perform.
         // CPU runs a 640x640 frame in ~0.1 s, so nothing is lost by staying off it.
-        // Worth retrying `.all` later purely as a speed experiment — it would let
-        // CoreML pick the Neural Engine, which an earlier build never got to test.
-        config.computeUnits = .cpuOnly
+        // BenchmarkView is that retry: it builds one detector per setting and
+        // times them, so the default here can be revisited with numbers.
+        config.computeUnits = computeUnits
+        self.computeUnits = computeUnits
 
         let started = Date()
         let mlModel = try MLModel(contentsOf: url, configuration: config)
