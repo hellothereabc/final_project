@@ -1,10 +1,17 @@
 # datasets — restored by the prepare_*.py scripts, never committed
 # (Laboro Tomato is CC BY-NC-SA 4.0; do not redistribute)
-data/
+/data/
 *.zip
 
 # cloned upstream repositories (see README for the clone command)
 repo/
+
+# reproduced dataset exports
+camacho_replication/data/
+
+# own phone photos for the field test - labels.csv is the artefact worth keeping,
+# the JPEGs are large and are not anyone else's to redistribute
+field_test/data/
 
 # training artefacts
 runs/
@@ -19,6 +26,11 @@ __pycache__/
 
 # os
 .DS_Store
+.Rhistory
+
+# xcode local state
+xcuserdata/
+*.xcuserstate
 
 # personal notes, not for the repo
 *.local.md

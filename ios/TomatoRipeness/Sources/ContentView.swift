@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var busy = false
     @State private var pickerItem: PhotosPickerItem?
     @State private var showCamera = false
+    @State private var showBenchmark = false
     /// Display-time cut-off, above the model's own baked-in 0.25. Fixed rather
     /// than user-adjustable: on in-domain frames moving it changes almost nothing,
     /// and the errors that matter (ripe fruit labelled half) are confident, so a
@@ -34,6 +35,7 @@ struct ContentView: View {
         .fullScreenCover(isPresented: $showCamera) {
             if let detector { CameraScreen(detector: detector) }
         }
+        .sheet(isPresented: $showBenchmark) { BenchmarkView() }
     }
 
     private var header: some View {
@@ -92,6 +94,16 @@ struct ContentView: View {
             }
             .buttonStyle(.bordered)
 
+            // Phone half of runtime_bench: the laptop cannot time this model
+            // on the Neural Engine, and no dataset number says what the export
+            // costs once Vision does the letterboxing.
+            Button {
+                showBenchmark = true
+            } label: {
+                Label("Benchmark", systemImage: "speedometer").labelStyle(.iconOnly)
+            }
+            .buttonStyle(.bordered)
+
             Button {
                 showCamera = true
             } label: {
@@ -141,6 +153,7 @@ struct ContentView: View {
                 run(on: sample)
             }
             if args.contains("-autorun-camera") { showCamera = true }
+            if args.contains("-autorun-benchmark") { showBenchmark = true }
         case .failure(let error):
             status = error.localizedDescription
         }
