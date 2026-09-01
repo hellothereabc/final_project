@@ -240,16 +240,22 @@ runs, and who letterboxes the image. `runtime_bench/bench.py` runs one checkpoin
 through every laptop-side runtime over the same 161 images and scores them with
 the same code.
 
-| runtime | ms/frame | fps | recall | stage accuracy | counting-MAE |
-|---|:--:|:--:|:--:|:--:|:--:|
-| torch, MPS | 28.1 | 36 | 0.875 | 0.947 | 1.04 |
-| torch, CPU | 55.0 | 18 | 0.875 | 0.947 | 1.04 |
-| CoreML, CPU only | 16.4 | 61 | 0.871 | 0.948 | 1.03 |
-| CoreML, CPU + Neural Engine | **6.0** | **166** | 0.873 | 0.949 | 1.03 |
-| CoreML, all units | 6.0 | 167 | 0.873 | 0.949 | 1.03 |
+All laptop rows are one MacBookPro18,3 (M1 Pro). Everything below the torch rows
+is the same fp16 `.mlpackage`; only the compute units change.
 
-- **The export costs nothing measurable.** fp16 and a baked NMS move recall by
-  0.002 and counting-MAE by 0.01, with per-class totals within 1%.
+| runtime | precision | ms/frame | fps | recall | stage accuracy | counting-MAE |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| torch, MPS | fp32 | 28.1 | 36 | 0.875 | 0.947 | 1.04 |
+| torch, CPU | fp32 | 55.0 | 18 | 0.875 | 0.947 | 1.04 |
+| CoreML, CPU only | fp16 | 16.4 | 61 | 0.871 | 0.948 | 1.03 |
+| CoreML, CPU + Neural Engine | fp16 | **6.0** | **166** | 0.873 | 0.949 | 1.03 |
+| CoreML, all units | fp16 | 6.0 | 167 | 0.873 | 0.949 | 1.03 |
+
+- **The export costs nothing measurable.** Going from the fp32 torch model to
+  the fp16 CoreML package moves recall by 0.002 and counting-MAE by 0.01, with
+  per-class totals within 1%. That figure covers two changes at once - the
+  precision and the NMS implementation, since the export bakes its own - so it
+  bounds the pair rather than isolating fp16.
 - **It is also 4.7x faster than the framework it was trained in.** The Neural
   Engine path runs the same model in 6 ms. The app currently forces `.cpuOnly`
   because both GPU paths crashed on device with an `MLIR pass manager failed`
@@ -268,18 +274,23 @@ the same code.
 iPhone18,1 on iOS 26.5.2, Release build, thermal state nominal, ten repeats over
 the three bundled samples, collected by the app's Benchmark screen:
 
-| runtime | ms/frame | fps | model load |
-|---|:--:|:--:|:--:|
-| phone, CPU only | 11.7 | 86 | 36 ms |
-| phone, CPU + Neural Engine | **3.8** | **262** | 600 ms |
-| laptop, CoreML CPU only | 16.4 | 61 | - |
-| laptop, CoreML CPU + Neural Engine | 6.0 | 166 | - |
+| runtime | silicon | ms/frame | fps | model load |
+|---|:--:|:--:|:--:|:--:|
+| phone, CPU only | iPhone18,1 | 11.7 | 86 | 36 ms |
+| phone, CPU + Neural Engine | iPhone18,1 | **3.8** | **262** | 600 ms |
+| laptop, CoreML CPU only | M1 Pro | 16.4 | 61 | - |
+| laptop, CoreML CPU + Neural Engine | M1 Pro | 6.0 | 166 | - |
 
-**The phone is faster than the laptop on both paths**, and its timing is the more
-inclusive of the two - it covers Vision's own scaling, while the laptop figure
-times only the CoreML call. On-device inference is not the compromise half of
-this system; at 262 fps the detector is nowhere near the camera's frame rate, and
-the app's forced `.cpuOnly` is costing 3.1x for nothing. Loading onto the Neural
+Same package, same fp16 weights, same framework on both sides: what differs is
+the silicon. A 2025 phone's Neural Engine runs this model in 3.8 ms where a 2021
+laptop's takes 6.0, and the phone's figure is the more inclusive of the two - it
+covers Vision's own scaling, while the laptop times only the CoreML call. So this
+is a statement about two specific chips four years apart, not about phones beating
+laptops in general.
+
+What it does settle is that **on-device inference is not the compromise half of
+this system**: at 262 fps the detector is nowhere near the camera's frame rate,
+and the app's forced `.cpuOnly` is costing 3.1x for nothing. Loading onto the Neural
 Engine costs 600 ms against 36 ms, which belongs in app startup rather than in
 the per-frame budget.
 
@@ -307,7 +318,8 @@ How the phone half is collected:
 The protocol is frozen at section 3's - laboro3, YOLO11n detect, 60 epochs, imgsz
 640, batch 16, seed 0 - and one augmentation group changes per run. `default` is
 section 3's own laboro3 run. Two of the six configs in `augmentation/train_aug.py`
-have been trained so far.
+have been trained to the full 60 epochs. `no_mosaic` has an early-stopped
+checkpoint at 37 epochs, included below only as a preliminary check.
 
 Ripeness is a colour judgement and the stock recipe jitters colour hard
 (`hsv_s 0.7`), so `no_colour` is the group this task has most reason to suspect.
@@ -322,6 +334,7 @@ recall / counting-MAE at the fixed conf 0.25 the earlier sections used:
 | default | 0.698 | 0.884 / 1.25 | 0.981 / 3.29 | 0.694 / 1.49 | 0.312 / 2.06 |
 | no_colour | **0.706** | 0.873 / **1.08** | 0.746 / **1.50** | 0.656 / 1.44 | 0.228 / 2.03 |
 | occlusion_aug | 0.701 | 0.865 / 1.19 | 0.976 / 3.01 | 0.671 / 1.51 | 0.283 / 2.01 |
+| no_mosaic, 37/60 epochs | 0.691 | 0.876 / 1.60 | 0.974 / 3.87 | 0.701 / 1.70 | 0.387 / 2.03 |
 
 Read at face value this says colour jitter is expensive: dropping it halves the
 transfer counting error. That reading is wrong, and finding out why is the more
@@ -370,7 +383,13 @@ having rectangles pasted over it at test time, even though the two operations ar
 nearly identical. Its small win on tuned tomatOD counting (1.32 vs 1.34) is well
 inside one-seed noise.
 
-Four configs remain: `no_mosaic`, `no_geometry`, `none`, `heavy`.
+The partial `no_mosaic` row is not a full ablation result yet, but it is already
+useful as a direction check: removing mosaic gets close to the default mAP
+(0.691 vs 0.698) while making counting worse on both Laboro and tomatOD. That
+does not support the idea that mosaic is the source of the counting or transfer
+problem.
+
+Three configs remain untrained: `no_geometry`, `none`, `heavy`.
 
 ## Running it
 
@@ -417,7 +436,7 @@ the non-commercial terms.
 ## Next
 
 - Their colour-analysis step, to get the per-stage R2 (0.809 / 0.897 / 0.968). Counting is the axis of this work, not mAP.
-- Finish the augmentation ablation: `no_mosaic`, `no_geometry`, `none` and `heavy` are written but not trained. The two that ran say less about augmentation than about thresholds.
+- Finish the augmentation ablation: `no_mosaic` has an early-stopped 37-epoch checkpoint; `no_geometry`, `none` and `heavy` are written but not trained. The rows that ran say less about augmentation than about thresholds.
 - Re-count section 3's matrix with a confidence sweep per cell, now that a fixed threshold is known to carry more than half the transfer penalty. Same for the occlusion sweep in section 4, whose counting column is also at conf 0.25.
 - Repeat the ablation on a second seed. Every difference it found in-domain is inside the range one seed could produce.
 - Field test: `field_test/` takes phone photos and hand counts and reports counting-MAE against them. Nothing here has been measured outside two research greenhouses.

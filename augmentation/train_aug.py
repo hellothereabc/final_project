@@ -60,6 +60,14 @@ CONFIGS = {
 DATA = ROOT / "data" / "cross" / "laboro3" / "data.yaml"
 
 
+def completed(run_dir, epochs):
+    results = run_dir / "results.csv"
+    weights = run_dir / "weights" / "best.pt"
+    if not results.exists() or not weights.exists():
+        return False
+    return max(0, sum(1 for _ in results.open()) - 1) >= epochs
+
+
 def run(name, args):
     from ultralytics import YOLO
 
@@ -98,9 +106,13 @@ def main():
         f"missing {BASELINE_RUN} - the `default` row is cross_dataset's laboro3 run")
 
     for name in (list(CONFIGS) if args.all else [args.config]):
-        if (ROOT / "runs" / f"aug_{name}").exists():
-            print(f"skipping {name}: runs/aug_{name} already exists")
+        run_dir = ROOT / "runs" / f"aug_{name}"
+        if completed(run_dir, args.epochs):
+            print(f"skipping {name}: runs/aug_{name} already has {args.epochs} epochs")
             continue
+        if run_dir.exists():
+            raise SystemExit(
+                f"runs/aug_{name} exists but is incomplete; move it aside before rerunning")
         run(name, args)
 
 
