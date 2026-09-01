@@ -34,11 +34,21 @@ RUNS = ROOT / "runs"
 BASELINE = "default"
 
 
-def available_runs():
+def completed(run_dir, epochs=60):
+    results = run_dir / "results.csv"
+    weights = run_dir / "weights" / "best.pt"
+    if not results.exists() or not weights.exists():
+        return False
+    return max(0, sum(1 for _ in results.open()) - 1) >= epochs
+
+
+def available_runs(allow_partial=False):
     runs = {BASELINE: RUNS / "cross_laboro3"}
     runs.update({d.name[4:]: d for d in sorted(RUNS.glob("aug_*")) if d.is_dir()})
-    return {name: path for name, path in runs.items()
-            if (path / "weights" / "best.pt").exists()}
+    if allow_partial:
+        return {name: path for name, path in runs.items()
+                if (path / "weights" / "best.pt").exists()}
+    return {name: path for name, path in runs.items() if completed(path)}
 
 
 def evaluate(name, run_dir, levels, conf, device):
@@ -109,9 +119,10 @@ def main():
     ap.add_argument("--conf", type=float, default=0.25)
     ap.add_argument("--device", default="mps")
     ap.add_argument("--out", default=str(ROOT / "runs" / "aug_matrix.json"))
+    ap.add_argument("--allow-partial", action="store_true")
     args = ap.parse_args()
 
-    runs = available_runs()
+    runs = available_runs(args.allow_partial)
     if args.runs:
         missing = [name for name in args.runs if name not in runs]
         assert not missing, f"no trained weights for {missing} - train_aug.py first"
