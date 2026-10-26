@@ -1,0 +1,279 @@
+\section{Background and Related Work}
+\label{sec:background}
+\label{sec:related}
+
+This section first reviews public tomato maturity datasets and the detectors
+trained on them. It then explains detector evaluation and the distinction
+between a count and a detection score. The remaining subsections review work on
+the factors varied in this study: annotation conventions, robustness to
+lighting, occlusion, and inference on an edge device. Table~\ref{tab:prior}
+summarises the resulting research gap.
+
+\subsection{Tomato maturity datasets and detectors}
+\label{sec:datasets-bg}
+
+Public annotated data for tomato maturity is recent. The two datasets used in
+this work were both released in 2020. \emph{Laboro Tomato} was published by
+Laboro.AI, a Japanese company, and contains 804 images collected at a local
+farm with two different cameras, at 3024$\times$4032 and 3120$\times$4160
+pixels \cite{laborotomato2020}. It has bounding boxes and instance masks for
+six classes, which combine two fruit sizes with three maturity stages. The
+stages are defined by the share of the fruit surface that is red: at least
+90\% for fully ripened, 30--89\% for half-ripened, and less than 30\% for green,
+which follows the logic of the USDA colour classes \cite{usda1991tomato}.
+\emph{tomatOD} was published by Tsironis \emph{et al.}\ \cite{tsironis2020tomatod}
+and contains 277 images taken over three days in April 2019 in a soilless
+greenhouse in Crete, Greece. The authors used a 12-megapixel machine-vision
+camera to simulate a camera mounted on a robot arm. Two agriculturists labelled
+its 2,418 boxes as unripe, semi-ripe or fully ripe. They deliberately left fruit
+unlabelled when more than 50\% was occluded or when it was beyond the second
+plant row. Thus, the datasets were collected in different countries with
+different cameras, annotators, and definitions of ripeness.
+
+Other public tomato datasets exist but are less suited to maturity counting.
+The Rob2Pheno dataset of Afonso \emph{et al.}\ \cite{afonso2020tomato} contains
+123 RGB-D images (720$\times$1280) from a commercial greenhouse in the
+Netherlands. Its red and green labels were derived automatically from a colour
+ratio and were not annotated by hand. The TomatoPlantFactory dataset
+\cite{wu2023plantfactory} contains 520 images of the Micro-Tom variety under
+artificial lighting in China, with two classes (green and red). A frequently
+used Kaggle dataset \cite{makeml2020tomato} has 895 images with a single
+``tomato'' class and no maturity labels. Laboro Tomato and tomatOD are, to our
+knowledge, the only two public datasets with three hand-annotated maturity
+stages in commercial-style greenhouses, which is why this work uses them.
+
+Researchers have applied several detector architectures to these datasets since
+2020. YOLO-Tomato (2020) adapted YOLOv3 with dense blocks and circular boxes
+to detect tomatoes under changing light and occlusion, without classifying maturity
+\cite{liu2020yolotomato}. Mu \emph{et al.}\ (2020) detected highly occluded
+green tomatoes with Faster R-CNN and estimated their number
+\cite{mu2020occluded}, and Afonso \emph{et al.}\ (2020) detected and counted
+tomatoes with Mask R-CNN \cite{afonso2020tomato}. Later work focused on
+maturity: Su \emph{et al.}\ (2022) classified four maturity classes with a
+MobileNet-based YOLOv3 \cite{su2022seyolov3}; Li \emph{et al.}\ (2023) improved
+YOLOv5 for four maturity stages \cite{li2023yolov5tomato}; and a second Li
+\emph{et al.}\ (2023) added attention to YOLOv8 for maturity detection and
+counting \cite{li2023mhsayolov8}. Camacho and Morocho-Cayamcela (2023) compared
+Mask R-CNN and YOLOv8 on a three-class version of Laboro Tomato
+\cite{camacho2023tomato}. We replicated their protocol as the starting point of
+this work. Each study trains and tests on a single dataset, usually its own, and
+reports mAP or precision and recall at one setting. We found no study that
+trains on Laboro Tomato and tests on tomatOD, or the reverse. The effect of the
+different annotation conventions has therefore not been measured before.
+
+\subsection{Maturity is a colour judgement, and its boundaries are conventions}
+
+A tomato ripens through a continuous change in pigment, from green chlorophyll
+through orange carotenoids to red lycopene. The change is gradual, so the
+discrete labels green, half-ripened and fully ripened divide a continuum. The
+fruit has no physical marker at the boundary between stages.
+Postharvest science measures this change with colour indices, most often the
+CIELAB $a^*$ value or the $a^*/b^*$ ratio \cite{lopezcamelo2004color}, and
+standards for grading tomatoes by colour define stages by the share of the
+surface that has turned red \cite{usda1991tomato}.
+
+A detector trained to name a stage learns the boundaries used by the people who
+annotated its training data. When it is evaluated against labels drawn by
+another team, its error therefore includes the disagreement between the two
+annotation conventions. Because the boundary is a colour threshold,
+illumination, camera white balance and over-exposed highlights also move a
+fruit across it. Section~\ref{sec:colour} measures where the two public datasets
+place these boundaries.
+
+\subsection{How detectors are evaluated}
+\label{sec:metrics-bg}
+
+Most fruit detectors use a single-stage design: the network predicts a set of
+boxes, each with a class and a confidence score, in one forward pass. This
+design is generally less accurate than two-stage methods such as Mask R-CNN,
+but is fast enough for real-time use \cite{redmon2016yolo}. The YOLO family is
+therefore widely used in agricultural vision. This work uses YOLO11
+\cite{khanam2024yolov11, jocher2024ultralytics}, whose five sizes (n, s, m, l,
+x) share one architecture and differ only in network width and depth. They
+therefore form a controlled series for measuring the effect of extra capacity.
+Before the boxes are returned, non-maximum suppression (NMS) removes duplicate
+boxes for the same object, keeping the most confident one \cite{neubeck2006nms}.
+
+Most studies compare detectors using mean average precision (mAP), as defined
+for the COCO benchmark \cite{lin2014coco}. A predicted box counts as
+correct when its intersection over union (IoU) with an annotated box exceeds a
+threshold. IoU is the ratio between the overlapping area of the two boxes and
+the total area covered by either box. Precision and recall are computed as the
+confidence threshold is lowered through the ranked list of predictions. The
+area under the precision--recall curve is averaged over classes and over IoU thresholds from
+0.5 to 0.95 (mAP50--95), or taken at IoU 0.5 only (mAP50). Two properties of
+mAP matter for this paper. First, it averages over all confidence thresholds and
+describes how well the predictions are ranked. It does not describe the model's
+behaviour at the single threshold used in an application. Second, it is computed
+per box and therefore does not directly measure a count derived from the boxes.
+
+\subsection{Counting is a different task from detecting}
+
+A greenhouse application needs a fruit count. To produce one, the application
+counts every prediction above a chosen confidence threshold. The number of
+predictions above this threshold depends on the calibration of the model's
+confidence scores. Calibration describes how closely a score of 0.7
+corresponds to a 70\% chance of being correct, and modern networks are known to be poorly
+calibrated \cite{guo2017calibration}. Detection errors can also cancel in the
+count. An image in which one fruit is missed and one false fruit is detected has
+a perfect count but two detection errors.
+
+Detection quality and counting quality have been shown to diverge in practice.
+In a comparison of fruit detection and counting methods for yield mapping in
+apple orchards, the method with the best detection result differed from the
+method with the best count \cite{hani2020comparative}. Reporting mAP without
+the count therefore leaves the error that matters to the application
+unmeasured.
+
+\subsection{Robustness to dataset and lighting changes}
+
+Computer-vision models often perform worse on a dataset other than the one used
+for training. Datasets can differ enough for a classifier to identify the source
+of an image, and models trained on one dataset can transfer poorly to others
+\cite{torralba2011unbiased}. Robustness to common
+image changes, such as noise, blur, weather and changes in brightness, has
+since been benchmarked systematically for image classification, and models
+that rank well on clean images can rank differently under such changes
+\cite{hendrycks2019benchmarking}. White-balance errors in particular have been
+shown to reduce the accuracy of trained networks \cite{afifi2019whatelse}.
+Data augmentation addresses this problem by adding synthetic variation that the
+training set lacks \cite{shorten2019augmentation}. In the YOLO training
+pipeline, the colour part of this augmentation is a random change of hue,
+saturation and brightness within three fixed limits \cite{bochkovskiy2020yolov4,
+ultralytics2026cfg}; Section~\ref{sec:hsv} tests whether widening those limits helps.
+
+Agricultural images are especially exposed to lighting change. Greenhouse light
+varies with the time of day, the weather and the glazing, and the feature being
+classified, colour, is the one that lighting changes most directly. Previous
+agricultural work has addressed illumination mainly by changing the input
+representation or by collecting more varied data. Kirk \emph{et al.}\ replace
+the RGB input with colour-opponent features and report better generalisation to
+a real strawberry farm than an RGB detector of comparable accuracy
+\cite{kirk2020lab}. Haggag \emph{et al.}\ vary dataset size, camera viewpoint
+and illumination for a tomato greenhouse detector and find illumination the
+hardest of the three shifts to generalise across
+\cite{haggag2024generalization}. Neither study tests the colour augmentation
+already present in the training pipeline, and neither reports whether the
+differences it observes remain when the model is retrained with a different
+random seed. None of the tomato maturity studies reviewed in
+Section~\ref{sec:datasets-bg} evaluates its detector under controlled changes
+of exposure or white balance.
+
+\subsection{Evaluation under occlusion}
+
+Occlusion has been studied through part-based architectures, controlled
+benchmarks and synthetic augmentation. Context-aware CompositionalNets show
+that the context around an object becomes especially important when the object
+is strongly occluded \cite{wang2020robust}. Gilroy \emph{et al.}\ argue that
+broad categories such as ``partly occluded'' hide useful information, and
+evaluate seven detectors at measured occlusion levels from 0\% to 99\%
+\cite{gilroy2023benchmark}. Kassaw \emph{et al.}\ compare real and artificial
+occlusion and find that performance depends on the type of occluder
+\cite{kassaw2026occlusion}. During training, methods such as Cutout, Random
+Erasing and CutMix hide or replace rectangular image regions to make networks
+less dependent on any single part of an object \cite{devries2017cutout, zhong2020randomerasing,
+yun2019cutmix}.
+
+In agriculture, Liao \emph{et al.}\ place real leaves over apples and control
+the share of each fruit that is hidden \cite{liao2025amodal}. This work follows
+the same principle, a known hidden fraction and an occluder taken from the same
+scene, but uses a rectangular strip of background, and adds two controls: a
+flat black strip, to measure the effect of the occluder's appearance, and the
+natural overlap between fruit, which needs no synthetic occluder at all.
+
+\subsection{Running the model on an edge device}
+
+A harvesting or scouting aid is used in the field, so its speed must be
+measured on its intended edge device. Running a model in the cloud requires
+a reliable network connection and adds a network round trip to every frame,
+which is often slower and less predictable than local inference
+\cite{kang2017neurosurgeon, shi2016edge}. Reviews of edge intelligence in agriculture identify
+connectivity as the main constraint on practical systems and argue for
+on-device inference \cite{shaheen2023edge}. Deep learning on smartphones is
+recent: Core ML and the first iPhone Neural Engine appeared in 2017
+\cite{apple2017ios11, apple2017iphonex}, and benchmarks of neural network inference on phones date
+from 2018--2019 \cite{ignatov2019aibenchmark}.
+
+Moving a model from a training workstation to a smartphone changes several
+parts of the inference pipeline at once. The weights are usually converted to
+16-bit floating point; NMS and image
+preprocessing may be built into the exported model; execution moves to a
+vendor-specific neural accelerator with its own numerical behaviour; and long
+runs heat the device, which may cause the operating system to reduce its speed.
+In Core ML, the term compute units denotes the processors that the
+runtime is allowed to use, such as the CPU and Neural Engine. A latency figure
+can therefore only be interpreted together with the device, the permitted
+compute units, the operating-system version, and whether the run was short or
+sustained.
+
+Edge deployment in agriculture has mostly been studied on single-board
+computers and dedicated accelerators. Mazzia \emph{et al.}\ run a reduced
+YOLOv3 for apple detection on a Raspberry Pi with a neural compute stick and on
+two NVIDIA Jetson boards, and treat the frame rate on these boards as the main
+constraint \cite{mazzia2020edge}. Work on citrus compares architectures by
+their speed on the target hardware \cite{dasilva2023citrus}. Model scaling has
+been studied as a design problem for YOLO detectors, varying width, depth and
+input resolution together against a hardware budget \cite{wang2021scaled}.
+For tomatoes specifically, Zeng \emph{et al.}\ (2023) quantised a
+lightweight YOLOv5 and ran it in an Android application at 26.5 frames per
+second \cite{zeng2023mobile}; TSE-YOLO (2025) runs ripeness detection and
+segmentation on an Android phone \cite{jia2025tseyolo}; GAE-YOLO (2025) runs on
+an NVIDIA Jetson TX2 with a maturity assessment \cite{liu2025gaeyolo}; and Kafi
+\emph{et al.}\ (2025) run a YOLOv8 tomato detector, without maturity stages, on
+the Neural Engine of an iPhone receiving video from a drone
+\cite{kafi2025drone}.
+These studies report a throughput figure for one platform. This work keeps one
+exported model fixed and measures its latency across devices, compute-unit
+settings, operating-system versions and run lengths.
+
+\subsection{What a single benchmark number hides}
+
+Reported improvements vary across training runs. Retraining the same
+configuration with a different random seed changes the data order, the
+augmentation and the initial weights, and the resulting spread is often as
+large as the differences that papers claim; taking that variance into account
+changes which comparisons hold up \cite{bouthillier2021variance}. Results from a
+single training run are still the norm in applied agricultural vision, which is
+why this work repeats the colour-augmentation experiments over three seeds and
+uses paired statistical tests (Section~\ref{sec:stats}).
+
+\subsection{Summary and research gap}
+
+Table~\ref{tab:prior} summarises which of the factors studied here previous
+tomato work has addressed. Each column is a factor that can change a reported
+counting error without any change to the model. Most previous studies report
+accuracy on one dataset with one model; counting, deployment on a device and
+seed variance each appear in only a few, and no study varies the annotation
+convention, the confidence threshold, or the lighting in a controlled way. This
+work evaluates a standard detector and measures how much each factor changes
+the result. The contribution is this controlled evaluation; no new detector is
+proposed.
+
+\begin{table*}[t]
+\centering
+\caption{Factors addressed by previous tomato detection studies and by this
+work. \checkmark: measured or reported; ($\checkmark$): partly, e.g.\ discussed
+qualitatively or for one model only; --: not addressed. ``Edge'' means that
+latency was measured on the target device.}
+\label{tab:prior}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccccccc}
+\toprule
+Study & Year & Maturity & Count & Cross-dataset & Occlusion & Lighting & Threshold & Edge \\
+\midrule
+Liu \emph{et al.}\ \cite{liu2020yolotomato}        & 2020 & --         & --         & -- & ($\checkmark$) & ($\checkmark$) & -- & -- \\
+Mu \emph{et al.}\ \cite{mu2020occluded}            & 2020 & --         & \checkmark & -- & \checkmark     & --             & -- & -- \\
+Afonso \emph{et al.}\ \cite{afonso2020tomato}      & 2020 & ($\checkmark$) & ($\checkmark$) & -- & --     & --             & -- & -- \\
+Su \emph{et al.}\ \cite{su2022seyolov3}            & 2022 & \checkmark & --         & -- & --             & --             & -- & -- \\
+Li \emph{et al.}\ \cite{li2023yolov5tomato}        & 2023 & \checkmark & --         & -- & --             & --             & -- & -- \\
+Li \emph{et al.}\ \cite{li2023mhsayolov8}          & 2023 & \checkmark & \checkmark & -- & --             & --             & -- & -- \\
+Camacho \emph{et al.}\ \cite{camacho2023tomato}    & 2023 & \checkmark & --         & -- & --             & --             & -- & -- \\
+Zeng \emph{et al.}\ \cite{zeng2023mobile}          & 2023 & --         & --         & -- & --             & --             & -- & \checkmark \\
+Haggag \emph{et al.}\ \cite{haggag2024generalization} & 2024 & --      & --         & ($\checkmark$) & --     & \checkmark     & -- & -- \\
+Jia \emph{et al.}\ \cite{jia2025tseyolo}           & 2025 & \checkmark & --         & -- & --             & --             & -- & \checkmark \\
+Kafi \emph{et al.}\ \cite{kafi2025drone}           & 2025 & --         & --         & -- & --             & --             & -- & \checkmark \\
+\midrule
+This work                                          & 2026 & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table*}

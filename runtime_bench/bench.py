@@ -82,7 +82,13 @@ class CoreMLRunner:
         self.model = ct.models.MLModel(
             str(path), compute_units=getattr(ct.ComputeUnit, compute_units))
         self.conf, self.iou, self.pad = conf, iou, pad
-        names = self.model.get_spec().description.metadata.userDefined["names"]
+        # ultralytics <= 8.3 copied the class names to the pipeline's own
+        # metadata; 8.4 leaves them only on the detector sub-model.
+        spec = self.model.get_spec()
+        metadata = [spec.description.metadata.userDefined]
+        if spec.WhichOneof("Type") == "pipeline":
+            metadata += [m.description.metadata.userDefined for m in spec.pipeline.models]
+        names = next(md["names"] for md in metadata if "names" in md)
         self.names = [part.split(":")[-1].strip(" '\"{}")
                       for part in names.split(",")]
 

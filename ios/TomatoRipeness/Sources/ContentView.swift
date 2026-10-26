@@ -1,3 +1,4 @@
+import CoreML
 import PhotosUI
 import SwiftUI
 
@@ -16,6 +17,12 @@ struct ContentView: View {
     /// threshold does not touch them. `-conf` still overrides it for sweeps.
     @State private var minConfidence: Float = 0.45
     @State private var lastMs: Double = 0
+    /// Which bundled model runs, and on what. Persisted so the choice survives a
+    /// relaunch; the size ladder is the point of having several models on the
+    /// phone at all, so switching is a menu on the main screen rather than a
+    /// setting buried elsewhere.
+    @AppStorage("modelName") private var modelName = ""
+    @AppStorage("useNeuralEngine") private var useNeuralEngine = false
 
     private let samples = ["sample1", "sample2", "sample3"]
 
@@ -32,21 +39,50 @@ struct ContentView: View {
         .padding()
         .task { await loadDetector() }
         .onChange(of: pickerItem) { _, item in Task { await loadPicked(item) } }
+        .onChange(of: modelName) { _, _ in Task { await loadDetector() } }
+        .onChange(of: useNeuralEngine) { _, _ in Task { await loadDetector() } }
         .fullScreenCover(isPresented: $showCamera) {
             if let detector { CameraScreen(detector: detector) }
         }
-        .sheet(isPresented: $showBenchmark) { BenchmarkView() }
+        .sheet(isPresented: $showBenchmark) { BenchmarkView(modelName: currentModelName) }
     }
 
     private var header: some View {
-        VStack(spacing: 2) {
+        VStack(spacing: 4) {
             Text("Tomato Ripeness").font(.headline)
+            modelMenu
             Text(status)
                 .font(.caption)
                 .foregroundStyle(detector == nil ? .red : .secondary)
                 .multilineTextAlignment(.center)
         }
     }
+
+    /// Model and compute-unit choice. Every entry is a compiled model in the
+    /// bundle (see Detector.availableModels); the Neural Engine toggle is the
+    /// setting BenchmarkView measured as 2-4x faster than the CPU default.
+    private var modelMenu: some View {
+        HStack(spacing: 8) {
+            Menu {
+                Picker("Model", selection: $modelName) {
+                    ForEach(Detector.availableModels(), id: \.self) { name in
+                        Text(name).tag(name)
+                    }
+                }
+            } label: {
+                Label(currentModelName, systemImage: "cpu")
+                    .font(.subheadline)
+            }
+            .buttonStyle(.bordered)
+            .disabled(busy)
+
+            Toggle("Neural Engine", isOn: $useNeuralEngine)
+                .toggleStyle(.button)
+                .font(.subheadline)
+                .disabled(busy)
+        }
+    }
+
 
     @ViewBuilder
     private var preview: some View {
@@ -127,19 +163,31 @@ struct ContentView: View {
         return UIImage(data: data)
     }
 
+    /// A stored choice that no longer exists in the bundle (a model removed
+    /// from the build) falls back to the default instead of a stale name.
+    private var currentModelName: String {
+        Detector.availableModels().contains(modelName) ? modelName : Detector.defaultModelName
+    }
+
     private func loadDetector() async {
         // Off the main actor: compiling a model can take seconds on first launch
         // and would otherwise block the first frame from ever being drawn.
+        let name = currentModelName
+        let units: MLComputeUnits = useNeuralEngine ? .cpuAndNeuralEngine : .cpuOnly
+        detector = nil
+        detections = []
+        status = "Loading \(name)…"
+        let started = Date()
         let result = await Task.detached(priority: .userInitiated) {
-            Result { try Detector() }
+            Result { try Detector(modelName: name, computeUnits: units) }
         }.value
 
         switch result {
         case .success(let loaded):
             detector = loaded
-            let names = loaded.labels.isEmpty ? "labels from model metadata unavailable"
-                                              : loaded.labels.joined(separator: ", ")
-            status = "Model ready · \(names)"
+            let loadMs = Date().timeIntervalSince(started) * 1000
+            status = String(format: "%@ ready on %@ · loaded in %.0f ms",
+                            loaded.modelName, useNeuralEngine ? "Neural Engine" : "CPU", loadMs)
 
             // Lets an automated run exercise the whole detect path without a tap:
             // build_run_sim(launchArgs: ["-autorun-sample1"]).
@@ -148,6 +196,11 @@ struct ContentView: View {
             if let i = args.firstIndex(of: "-conf"), i + 1 < args.count,
                let parsed = Float(args[i + 1]) {
                 minConfidence = min(max(parsed, 0.25), 0.9)
+            }
+            if let i = args.firstIndex(of: "-model"), i + 1 < args.count,
+               Detector.availableModels().contains(args[i + 1]), args[i + 1] != modelName {
+                modelName = args[i + 1]   // triggers a reload through onChange
+                return
             }
             if args.contains("-autorun-sample1"), let sample = Self.bundleImage("sample1") {
                 run(on: sample)

@@ -1,0 +1,27 @@
+\subsection{Deployment protocol}
+
+The mixed detector is exported to FP16 Core ML with non-maximum suppression
+included, at confidence 0.25 and IoU 0.45 (Section~\ref{sec:ladder-method}). Mac
+measurements use the same 161 images and scoring code for PyTorch and for each
+Core ML processor configuration. The smartphone benchmark uses the identical
+model package and three bundled 640$\times$640 images over ten repetitions. It
+records median latency and p90 latency, an upper-tail value that captures slow
+frames as well as typical ones. It also records load time, model outputs,
+device identifier, OS, and thermal state.
+
+The same benchmark software measures every size in the ladder on two devices: a
+Mac16,8 laptop and an iPhone~17~Pro (\texttt{iPhone18,1}). Each device uses two
+compute-unit settings. Compute units specify which processors Core ML may use;
+the settings are CPU only and CPU with the Neural Engine. We install a Release
+build of the companion application on the device and select the model
+under test through a launch argument. The report is then transferred from the
+device automatically, without manual transcription. The reported latency covers
+inference only. It excludes camera capture, display, and application rendering,
+so it is a lower bound on the cost of a live-camera pipeline.
+
+We also measure sustained behaviour and cross-device agreement. The sustained
+test runs 4{,}500 consecutive frames on the Neural Engine. We report its median,
+p90, and the thermal state provided by the operating system at the end of the
+run. To check cross-device agreement, we score the same images on the laptop and
+the smartphone and match the two sets of boxes. This check establishes whether
+the devices produce the same detections before their timings are compared.

@@ -1,0 +1,32 @@
+\subsection{Statistical analysis}
+\label{sec:stats}
+
+We estimate training variation separately from evaluation variation.
+\emph{Training variation} is estimated by repeating every colour-augmentation
+configuration at seeds 0, 1, and 2 under an identical protocol. We also repeat
+the \texttt{stock} configuration so that its variation across runs provides a
+noise floor for differences between recipes. Results are reported as the mean
+over seeds with the observed range. We do not assume that three runs establish
+a normal distribution.
+
+\emph{Evaluation variation} is estimated at image level, where the sample is
+larger. For two models at one perturbation level, we calculate their difference
+in counting error for each of the 161 validation images. We resample these
+paired differences with 10{,}000 bootstrap replicates to obtain a 95\%
+confidence interval. We also test the paired null hypothesis with a sign-flip
+permutation test that uses 10{,}000 relabellings of the same per-image
+differences. We use a permutation test because the per-image counting errors
+are small integers with many ties. The tie correction for a signed-rank
+statistic is approximate in this setting, whereas the sign-flip null is exact
+under the paired-exchangeability hypothesis. Detection recall is a ratio of
+pooled counts, not a per-image mean. Its interval therefore uses the same
+bootstrap applied to the per-image matched and ground-truth counts. When we test
+a family of levels together, we adjust the $p$-values across that family with
+the Holm correction.
+
+We average each per-image series over seeds before the paired test. The
+resulting interval therefore refers to a recipe and not to one checkpoint.
+
+We report both estimates. The bootstrap interval quantifies uncertainty on this
+validation set. The seed range shows how much of a difference remains after
+retraining.

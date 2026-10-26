@@ -1,0 +1,71 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+This work asked how much of a reported tomato counting error belongs to the
+measurement protocol and how much to the detector. Six protocol choices were
+varied one at a time, and the training recipe was held fixed wherever the
+question allowed it. The choices were the annotation convention that defines a
+maturity stage, the occluder, the confidence threshold, the illumination of the
+test frames, the model size, and the runtime used to execute the model.
+
+The measured effects differ in magnitude, and model size does not produce the
+largest change. Across the YOLO11 ladder trained under one protocol, clean
+recall spans 0.058 and mAP50--95 spans 0.068. Both stop improving at YOLO11m,
+while package size, latency, and load time continue to grow through YOLO11x.
+Over-exposing the same validation frames by three stops reduces the strongest
+model's recall by 0.205. A cool white-balance cast reduces recall by 0.05 to
+0.08. Hiding 40\% of each fruit reduces recall by more than 0.3. This result
+also depends on the occluder's appearance: recall is 0.571 under a same-image
+background patch and 0.461 under a black patch at the same hidden fraction.
+Changing the annotation convention places 98\% of one dataset's fully ripe
+boxes within the other dataset's half-ripened band. The class-level transfer
+error follows the same direction. Changing the confidence threshold alters
+cross-domain counting error by more than a factor of two while leaving mAP
+unchanged. Selecting the threshold separately for each model also reorders the
+counting results in the size ladder. The FP16 Core ML export changes recall by
+at most 0.002. For the same package, latency varies with the compute units
+(2.0$\times$ to 4.1$\times$), the device (1.21$\times$ to 3.85$\times$ against
+a laptop), the operating-system version (67\% for the smallest model across a
+single update), and the run length (8.8\% drift over 4{,}500 frames for the
+largest).
+
+A protocol based on one summary number would have changed three conclusions.
+An ablation evaluated on clean held-out frames would have recommended removing
+the colour jitter. Removing it has no measured cost on clean data but reduces
+recall by up to 0.102 after perturbation. A single training run at the most
+perturbed level reported the default recipe at the most favourable of its three
+seeds. The tuned counting column of the size ladder implies that counting
+improves with capacity, while the fixed-threshold column does not support that
+conclusion.
+
+These results establish a reporting requirement. A reproducible counting error
+must identify the annotation source and the colour boundary used by that
+source. An occlusion result must identify the occluder and matching rule. A
+counting result must report the confidence threshold and the split used to
+select it, while a lighting evaluation must state its illumination range. A
+latency result must identify the device, compute units, operating system, and
+run duration. Reporting these details separately allows the detection, staging,
+counting, and deployment results to be reproduced. A single aggregate number
+does not preserve this information.
+
+For the application that motivated the work, the practical conclusions are
+specific. YOLO11n and YOLO11s meet a 30\,FPS camera budget on the smartphone's
+Neural Engine with three to four times the required margin at their p90
+latency. Models above YOLO11m do not improve accuracy, so additional capacity
+does not address the measured limitations of this system. The default HSV
+jitter should be retained because removing it costs an order of magnitude more
+than widening it returns. Fully-ripe counting error should be reported alongside
+mAP because the two metrics do not follow the same pattern. The confidence
+threshold should be selected on frames that are not used to report the result.
+
+Future work should test the photometric results on a collection recaptured under
+measured illumination. The current sweep is a simulation applied to existing
+frames, so the additional collection would show whether the ordering holds with
+real sensor behaviour. Instance masks would improve the box-overlap estimate of
+natural occlusion, although they would still not establish depth order. Seed
+repeats across the whole ladder, beyond the colour recipes, would allow the
+differences among YOLO11m, l, and x to be ranked instead of reported as
+indistinguishable. The deployment study also lacks a comparison between a
+training-time intervention and exposure control at capture time. Such a
+comparison could determine whether capture control recovers the over-exposure
+loss at a lower cost than changing the model.

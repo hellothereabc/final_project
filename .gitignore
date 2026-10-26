@@ -34,3 +34,24 @@ xcuserdata/
 
 # personal notes, not for the repo
 *.local.md
+
+# Size-ladder exports bundled into the app for the model picker (~220 MB);
+# regenerate with ios/TomatoRipeness/sync_models.sh from ios_model/.
+ios/TomatoRipeness/Resources/models/
+
+# paper: local build output, generated Overleaf copy, review snapshots
+paper/_snapshots/
+paper/build/
+paper/overleaf/
+paper/pdf_*/
+paper/main.aux
+paper/main.bbl
+paper/main.blg
+paper/main.pdf
+paper/main.out
+
+# Core ML exports (large, regenerable with export_coreml.py)
+ios_model/yolo11*_fp16/
+
+# local agent context
+.context/

@@ -1,0 +1,24 @@
+\subsection{Model-size ladder}
+\label{sec:ladder-method}
+
+We train all five YOLO11 sizes under one protocol to measure the effect of model
+size directly. This avoids a comparison based on published scaling numbers from
+different protocols. YOLO11n, s, m, l, and x are trained on the Laboro split
+for 60 epochs at 640 pixels with seed 0 and nominal batch 64. Their physical
+batches, the numbers of images processed together in one training step, are 16,
+16, 8, 8, and 4 respectively. These are the largest batches that fit in 24\,GB
+of unified memory. Every checkpoint is exported to FP16 Core ML with
+non-maximum suppression (NMS) included in the exported model, using confidence
+0.25 and IoU 0.45. A detector proposes many overlapping boxes for the same
+fruit; NMS keeps the most confident box and removes any other box that overlaps
+it by more than the IoU threshold \cite{neubeck2006nms}. Including it in the exported
+model means that the timed model is exactly the model that would be shipped in
+the application.
+
+We then score each size in three ways. Detection quality is measured by
+mAP50--95 on the Laboro validation split. Counting quality is the best counting
+MAE over a sweep of the confidence threshold, reported for all stages together
+and for fully ripe fruit alone. Computational cost is measured by Core ML
+package size, model load time, and inference latency on both devices. We report
+the median and the p90, an upper-tail latency that captures slow frames as well
+as typical ones.

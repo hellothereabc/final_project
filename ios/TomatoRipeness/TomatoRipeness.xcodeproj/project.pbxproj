@@ -10,11 +10,15 @@
 		003A9C14FDD926B5898B8E43 /* sample1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0CFB27E95AE8828BC6735401 /* sample1.jpg */; };
 		02AB6BBAD1C5E87B7507AC74 /* sample3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 349DBD89E10A3360ED346C83 /* sample3.jpg */; };
 		1FF79377A7B4A6A0A87B9A44 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03EB7194516330FC458A2E13 /* CameraController.swift */; };
-		4331ACBAF03A028D20C69C74 /* TomatoRipeness.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F7393902F1B3699DACDB0D38 /* TomatoRipeness.mlpackage */; };
+		2E083FC58985B1A78A40145F /* YOLO11x.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = A42EFD85E12897DE72C30291 /* YOLO11x.mlpackage */; };
+		479604B474F9062B908227BC /* YOLO11n.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = AC492E32B161BD40E2F088A2 /* YOLO11n.mlpackage */; };
+		59AC4CC94463A266F6FAB9CE /* YOLO11m.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 54FADA66E0B8BBFC201373AD /* YOLO11m.mlpackage */; };
 		6215F653A00FB9AD031255FC /* BenchmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16BD792E57E1B83806B9990F /* BenchmarkView.swift */; };
+		69760D9A770EB286C237C2F7 /* YOLO11s.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = CC58D9FD06A276802C3286A6 /* YOLO11s.mlpackage */; };
 		6ED27317BB8A80E3B2281D53 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 812FBE462A34C655E28D3453 /* ContentView.swift */; };
 		86A7DB1A11676A01E8538A50 /* sample2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 63ED53B304FD8DE0D72272CB /* sample2.jpg */; };
 		B1D65A88F77E9BC38F358582 /* TomatoRipenessApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B545F8592620F3F81B7E2A /* TomatoRipenessApp.swift */; };
+		DE21326F113EB4678C24E208 /* YOLO11l.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 8891F8B6D6746CD4037DAEFA /* YOLO11l.mlpackage */; };
 		E3D76A493E705FA6A4DF4391 /* Detector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD613FAB26F57F2219B262F7 /* Detector.swift */; };
 		EABD92C287AAEA930F1F919D /* CameraScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2E975A6F3B75F9D4665B246 /* CameraScreen.swift */; };
 		EE2C3918D62AB99E90D95EA9 /* BoxOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5B63D6B0A9E572AE65699B /* BoxOverlay.swift */; };
@@ -26,20 +30,24 @@
 		16BD792E57E1B83806B9990F /* BenchmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenchmarkView.swift; sourceTree = "<group>"; };
 		30B545F8592620F3F81B7E2A /* TomatoRipenessApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TomatoRipenessApp.swift; sourceTree = "<group>"; };
 		349DBD89E10A3360ED346C83 /* sample3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = sample3.jpg; sourceTree = "<group>"; };
+		54FADA66E0B8BBFC201373AD /* YOLO11m.mlpackage */ = {isa = PBXFileReference; path = YOLO11m.mlpackage; sourceTree = "<group>"; };
 		63ED53B304FD8DE0D72272CB /* sample2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = sample2.jpg; sourceTree = "<group>"; };
 		6C3E115EF231CA5EE01107E1 /* TomatoRipeness.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TomatoRipeness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		812FBE462A34C655E28D3453 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		8891F8B6D6746CD4037DAEFA /* YOLO11l.mlpackage */ = {isa = PBXFileReference; path = YOLO11l.mlpackage; sourceTree = "<group>"; };
+		A42EFD85E12897DE72C30291 /* YOLO11x.mlpackage */ = {isa = PBXFileReference; path = YOLO11x.mlpackage; sourceTree = "<group>"; };
+		AC492E32B161BD40E2F088A2 /* YOLO11n.mlpackage */ = {isa = PBXFileReference; path = YOLO11n.mlpackage; sourceTree = "<group>"; };
 		C2E975A6F3B75F9D4665B246 /* CameraScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraScreen.swift; sourceTree = "<group>"; };
+		CC58D9FD06A276802C3286A6 /* YOLO11s.mlpackage */ = {isa = PBXFileReference; path = YOLO11s.mlpackage; sourceTree = "<group>"; };
 		CD613FAB26F57F2219B262F7 /* Detector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Detector.swift; sourceTree = "<group>"; };
 		DB5B63D6B0A9E572AE65699B /* BoxOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxOverlay.swift; sourceTree = "<group>"; };
-		F7393902F1B3699DACDB0D38 /* TomatoRipeness.mlpackage */ = {isa = PBXFileReference; path = TomatoRipeness.mlpackage; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		0E5266BA976C378D760C0BBB = {
 			isa = PBXGroup;
 			children = (
-				9E0CA22B6A8708E21CD5D80A /* Resources */,
+				5CF2CBDBD1F43CF21B90E77B /* models */,
 				3E383BE7EFECDE3662C115F2 /* samples */,
 				99083D5CDED8442A22C64838 /* Sources */,
 				EA6C861DFA46B37567FDF608 /* Products */,
@@ -57,6 +65,19 @@
 			path = Resources/samples;
 			sourceTree = "<group>";
 		};
+		5CF2CBDBD1F43CF21B90E77B /* models */ = {
+			isa = PBXGroup;
+			children = (
+				8891F8B6D6746CD4037DAEFA /* YOLO11l.mlpackage */,
+				54FADA66E0B8BBFC201373AD /* YOLO11m.mlpackage */,
+				AC492E32B161BD40E2F088A2 /* YOLO11n.mlpackage */,
+				CC58D9FD06A276802C3286A6 /* YOLO11s.mlpackage */,
+				A42EFD85E12897DE72C30291 /* YOLO11x.mlpackage */,
+			);
+			name = models;
+			path = Resources/models;
+			sourceTree = "<group>";
+		};
 		99083D5CDED8442A22C64838 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
@@ -69,14 +90,6 @@
 				30B545F8592620F3F81B7E2A /* TomatoRipenessApp.swift */,
 			);
 			path = Sources;
-			sourceTree = "<group>";
-		};
-		9E0CA22B6A8708E21CD5D80A /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				F7393902F1B3699DACDB0D38 /* TomatoRipeness.mlpackage */,
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 		EA6C861DFA46B37567FDF608 /* Products */ = {
@@ -166,8 +179,12 @@
 				EABD92C287AAEA930F1F919D /* CameraScreen.swift in Sources */,
 				6ED27317BB8A80E3B2281D53 /* ContentView.swift in Sources */,
 				E3D76A493E705FA6A4DF4391 /* Detector.swift in Sources */,
-				4331ACBAF03A028D20C69C74 /* TomatoRipeness.mlpackage in Sources */,
 				B1D65A88F77E9BC38F358582 /* TomatoRipenessApp.swift in Sources */,
+				DE21326F113EB4678C24E208 /* YOLO11l.mlpackage in Sources */,
+				59AC4CC94463A266F6FAB9CE /* YOLO11m.mlpackage in Sources */,
+				479604B474F9062B908227BC /* YOLO11n.mlpackage in Sources */,
+				69760D9A770EB286C237C2F7 /* YOLO11s.mlpackage in Sources */,
+				2E083FC58985B1A78A40145F /* YOLO11x.mlpackage in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

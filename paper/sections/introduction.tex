@@ -1,0 +1,104 @@
+\section{Introduction}
+
+A grower deciding when to send pickers into a greenhouse needs to know, for
+each row, how many fruit are ready now and how many will be ready next week.
+Harvest scheduling and short-term yield forecasting both rely on these
+per-stage counts. In the longer term, an automated harvesting robot can use the
+same counts to decide which fruit to pick \cite{kootstra2021harvesting, yaguchi2016tomato}.
+Cameras can provide these counts because tomato maturity is judged almost
+entirely from colour, which can be measured from an image.
+
+The deployment device affects both latency and reliability. Greenhouse rows
+often have poor network coverage. Sending every frame to a cloud server also
+adds a network round trip to each prediction, making latency higher and less
+predictable than on-device inference \cite{kang2017neurosurgeon, shi2016edge}.
+A smartphone provides a camera and a dedicated neural accelerator. This work
+therefore assumes that inference runs on such an edge device and uses the camera
+frame rate as the time budget for the detector. Running convolutional detectors
+at camera frame rate on a smartphone has only recently become practical. Apple
+introduced its on-device inference framework, Core ML, in June 2017, and its
+first smartphone Neural Engine, in the A11 chip, in September of the same year
+\cite{apple2017ios11, apple2017iphonex}.
+
+Public datasets with annotated greenhouse tomatoes and maturity labels have
+existed since 2020 \cite{laborotomato2020, tsironis2020tomatod}. Detectors of
+the YOLO family \cite{redmon2016yolo, khanam2024yolov11} train on them in under
+an hour, and studies published between 2020 and 2025 report mean average
+precision (mAP) values that improve on one another by a few points
+\cite{liu2020yolotomato, su2022seyolov3, li2023yolov5tomato, li2023mhsayolov8, camacho2023tomato}. In almost all of these studies, a
+detector is trained on one dataset and its mAP is reported on that dataset's
+validation split.
+
+A counting error reported in this way depends on at least six choices. The
+model is only one of them. First, annotation teams may use different meanings
+of \emph{ripe}, so a model learns the colour boundary used in its training
+dataset. Second, leaves and neighbouring fruit conceal parts of many fruit. The
+construction of an occlusion test can therefore change its result. Third, a
+count includes every detection above a confidence threshold. The number of
+detections retained depends on the calibration of the model's confidence
+scores, as well as its ability to rank fruit \cite{guo2017calibration}. Fourth,
+lighting changes the colour used to determine the stage. Fifth, larger models
+require more memory and inference time, which may exceed the resources of an
+edge device. Sixth, an exported model can use different numerical precision,
+preprocessing and hardware from the training checkpoint used for evaluation.
+
+Each choice can change the reported result while the trained weights remain
+fixed, yet papers usually report a single figure. Two papers can therefore
+report the same counting error for the same crop while using different
+measurement conditions. A speed measured on a development machine may also
+differ on the intended deployment device.
+
+This work asks: \emph{how much does the evaluation protocol contribute to a
+reported tomato counting error, how much does the model contribute, and what
+must be reported for the figure to be reproducible?} To answer these questions,
+we vary the annotation convention, the occluder, the confidence threshold, the
+lighting, the model size and the inference hardware one at a time. We keep the
+detector fixed wherever possible and measure the effect of each change.
+
+Previous work has studied individual parts of this problem, but has not
+examined them together. Tomato maturity studies train and test on a single
+dataset and report mAP
+\cite{su2022seyolov3, li2023yolov5tomato, li2023mhsayolov8, camacho2023tomato}.
+Detectors for tomatoes have been run on Android phones
+\cite{zeng2023mobile, jia2025tseyolo}, on an NVIDIA Jetson board
+\cite{liu2025gaeyolo}, and, for fruit detection without maturity stages, on the
+Neural Engine of an iPhone \cite{kafi2025drone}; each of these reports the
+speed of one or a few models on one platform. To our knowledge, this is the
+first study that compares the two public tomato maturity datasets under one
+label set, and the first to report maturity detection accuracy, counting error
+and Neural Engine latency together for a complete YOLO11 model-size range (n
+to x) on a smartphone.
+
+This work makes six contributions:
+\begin{enumerate}
+\item It measures how well detectors transfer between Laboro Tomato and
+tomatOD after both are mapped onto one three-stage label set, and explains the
+asymmetric errors by measuring where each dataset places its colour boundaries.
+\item It separates detection, stage assignment and counting under controlled
+occlusion, and shows how the matching threshold and the occluder's appearance
+change the result.
+\item It shows that a fixed confidence threshold can reverse a cross-dataset
+counting comparison in which mAP shows no difference.
+\item It follows one trained model from FP32 PyTorch, through FP16 Core ML, to
+a physical iPhone, and checks that the laptop and the smartphone produce the same
+detections.
+\item It trains all five YOLO11 sizes under one protocol and measures accuracy,
+counting error, package size and latency on a laptop and on the smartphone. Accuracy
+stops improving at the medium model (YOLO11m), while the largest model
+(YOLO11x) only just meets the real-time budget, so the two sizes above YOLO11m
+increase latency without improving accuracy.
+\item It measures how much a change in exposure or white balance of the test
+images reduces accuracy, and whether a wider colour augmentation during
+training recovers the loss, with every configuration trained at three seeds so
+that real effects can be separated from training noise
+\cite{bouthillier2021variance}.
+\end{enumerate}
+
+The rest of the paper is organised as follows.
+Section~\ref{sec:background} reviews tomato maturity detection, the public
+datasets, how detectors are evaluated, and previous work on robustness,
+occlusion and on-device inference, and identifies the gap this work addresses.
+Section~\ref{sec:methods} describes the datasets, experimental protocols and
+statistical analysis. Section~\ref{sec:results} reports the six experiments.
+Sections~\ref{sec:discussion} to \ref{sec:conclusion} discuss the results,
+describe the software artefact and its limitations, and conclude.

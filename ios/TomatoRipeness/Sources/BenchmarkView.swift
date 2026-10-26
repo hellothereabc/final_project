@@ -24,6 +24,9 @@ import UIKit
 struct BenchmarkView: View {
     @Environment(\.dismiss) private var dismiss
 
+    /// Which bundled model to time: the one the main screen has selected.
+    var modelName: String = Detector.defaultModelName
+
     @State private var running = false
     @State private var progress = ""
     @State private var rows: [Row] = []
@@ -47,6 +50,7 @@ struct BenchmarkView: View {
         NavigationStack {
             List {
                 Section("run") {
+                    LabeledContent("Model", value: modelName)
                     Stepper("Repeats per image: \(repeats)", value: $repeats, in: 1...50)
                     Toggle("Include GPU paths (may crash)", isOn: $includeGPU)
                     Button(running ? "Running…" : "Start") { start() }
@@ -99,6 +103,19 @@ struct BenchmarkView: View {
             .toolbar { ToolbarItem(placement: .cancellationAction) {
                 Button("Done") { dismiss() }.disabled(running)
             } }
+            .onAppear {
+                if ProcessInfo.processInfo.arguments.contains("-autorun-benchmark"),
+                   !running, rows.isEmpty {
+                    Task {
+                        let delay = Self.benchmarkDelaySeconds()
+                        if delay > 0 {
+                            progress = "waiting \(delay)s for profiler…"
+                            try? await Task.sleep(for: .seconds(delay))
+                        }
+                        start()
+                    }
+                }
+            }
         }
     }
 
@@ -113,6 +130,9 @@ struct BenchmarkView: View {
             ("cpuOnly", .cpuOnly),
             ("cpuAndNeuralEngine", .cpuAndNeuralEngine),
         ]
+        if ProcessInfo.processInfo.arguments.contains("-benchmark-ane-only") {
+            configs = [("cpuAndNeuralEngine", .cpuAndNeuralEngine)]
+        }
         if includeGPU {
             configs.append(("cpuAndGPU", .cpuAndGPU))
             configs.append(("all", .all))
@@ -122,7 +142,7 @@ struct BenchmarkView: View {
             guard let image = Self.bundleImage(name) else { return nil }
             return (name, image)
         }
-        let passes = repeats
+        let passes = Self.benchmarkRepeatsOverride() ?? repeats
 
         Task.detached(priority: .userInitiated) {
             var payload: [[String: Any]] = []
@@ -133,7 +153,7 @@ struct BenchmarkView: View {
                 let loadStarted = Date()
                 let detector: Detector
                 do {
-                    detector = try Detector(computeUnits: units)
+                    detector = try Detector(modelName: modelName, computeUnits: units)
                 } catch {
                     await MainActor.run {
                         rows.append(Row(units: name, medianMs: 0, p90Ms: 0, loadMs: 0,
@@ -158,8 +178,11 @@ struct BenchmarkView: View {
                         timings.append(Date().timeIntervalSince(started) * 1000)
                         if pass == passes - 1 { lastDetections[imageName] = found }
                     }
-                    await MainActor.run {
-                        progress = "\(name): pass \(pass + 1)/\(passes)"
+                    let updateEvery = max(1, passes / 100)
+                    if pass % updateEvery == 0 || pass == passes - 1 {
+                        await MainActor.run {
+                            progress = "\(name): pass \(pass + 1)/\(passes)"
+                        }
                     }
                 }
 
@@ -202,6 +225,7 @@ struct BenchmarkView: View {
             }
 
             let document: [String: Any] = [
+                "model": Self.benchmarkModelLabel(default: modelName),
                 "device": Self.machine(),
                 "os": ProcessInfo.processInfo.operatingSystemVersionString,
                 "repeats": passes,
@@ -211,12 +235,54 @@ struct BenchmarkView: View {
                                                     options: [.prettyPrinted, .sortedKeys]))
                 .flatMap { String(data: $0, encoding: .utf8) } ?? "{}"
 
+            // Keep an automation-friendly copy in stdout. Instruments can
+            // capture this even when CoreDevice file-copy services are flaky.
+            if let output = ("BENCHMARK_JSON_BEGIN\n" + json
+                + "\nBENCHMARK_JSON_END\n").data(using: .utf8) {
+                FileHandle.standardOutput.write(output)
+            }
+
             await MainActor.run {
                 report = json
-                progress = "done — copy the JSON"
+                Self.saveReport(json)
+                progress = "done — JSON saved and ready to copy"
                 running = false
             }
         }
+    }
+
+    private nonisolated static func benchmarkModelLabel(default name: String) -> String {
+        let args = ProcessInfo.processInfo.arguments
+        guard let flag = args.firstIndex(of: "-benchmark-model"),
+              args.indices.contains(flag + 1)
+        else { return name }
+        return args[flag + 1]
+    }
+
+    private nonisolated static func benchmarkRepeatsOverride() -> Int? {
+        let args = ProcessInfo.processInfo.arguments
+        guard let flag = args.firstIndex(of: "-benchmark-repeats"),
+              args.indices.contains(flag + 1),
+              let value = Int(args[flag + 1]), value > 0
+        else { return nil }
+        return min(value, 10_000)
+    }
+
+    private nonisolated static func benchmarkDelaySeconds() -> Int {
+        let args = ProcessInfo.processInfo.arguments
+        guard let flag = args.firstIndex(of: "-benchmark-delay"),
+              args.indices.contains(flag + 1),
+              let value = Int(args[flag + 1]), value > 0
+        else { return 0 }
+        return min(value, 60)
+    }
+
+    private nonisolated static func saveReport(_ report: String) {
+        guard let documents = FileManager.default.urls(
+            for: .documentDirectory, in: .userDomainMask).first
+        else { return }
+        try? report.write(to: documents.appendingPathComponent("benchmark.json"),
+                          atomically: true, encoding: .utf8)
     }
 
     private static func bundleImage(_ name: String) -> UIImage? {

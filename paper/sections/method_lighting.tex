@@ -1,0 +1,49 @@
+\subsection{Photometric perturbation}
+
+We simulate test-time lighting changes by applying two single-parameter changes
+to the validation images. Exposure and white-balance shifts are common camera
+errors, and previous work has used both to test predictions under changed
+capture conditions \cite{hendrycks2019benchmarking, afifi2019whatelse}; exposure
+errors in particular are usually simulated in steps of exposure value (stops)
+\cite{afifi2021exposure}. We apply both changes in linear light after undoing
+the sRGB gamma curve, then convert the result back to sRGB, following the
+standard practice of inverting the camera's processing before changing gains
+\cite{brooks2019unprocessing}. A gain applied this way corresponds to what the
+camera itself would have done, whereas the same gain applied to gamma-encoded
+pixel values would not.
+The exposure intervention multiplies every channel by $2^{k}$ for $k \in [-3,
+3]$ stops. The white-balance intervention applies opposite gains to the red and
+blue channels, $1 \pm 0.35w$ for $w \in [-1.5, 1.5]$, while keeping green fixed.
+Positive $w$ produces a warm cast and negative $w$ a cool cast. Section~\ref{sec:colour}
+measures ripeness along a green-to-red axis. A colour cast therefore moves the
+apparent colour of every fruit along the axis used to assign its stage before
+the detector processes the image.
+
+The intervention recolours the pixels without changing the ground-truth boxes.
+Exposure changes confidence scores across the predictions. We therefore run
+each level once with a minimum confidence of 0.05 and score the resulting
+predictions at every threshold in the sweep. The tables report a fixed
+threshold of 0.25 alongside the best threshold for that level. A comparison at
+only the fixed threshold would combine changes in calibration with changes in
+robustness, as shown across datasets in Section~\ref{sec:calibration}.
+
+\subsection{Training-time colour augmentation}
+
+During training, Ultralytics YOLO changes the colour of every training image by
+a random amount in HSV space, which represents hue, saturation, and value. This
+form of photometric augmentation was introduced for the YOLO family in YOLOv4
+\cite{bochkovskiy2020yolov4}. Three parameters set the maximum change. Their default values
+are $h=0.015$, $s=0.7$ and $v=0.4$ \cite{ultralytics2026cfg}. This is the only colour
+augmentation in the pipeline. We compare four configurations while keeping
+everything else unchanged. The \texttt{stock} configuration uses the default
+recipe. The \texttt{hsv\_v08} configuration doubles the brightness jitter to
+$v=0.8$. The \texttt{hsv\_wide} configuration uses $v=0.8$ and widens hue to
+$h=0.05$, which is the HSV change most similar to a colour cast. The
+\texttt{no\_colour} configuration sets all three parameters to zero and provides
+the comparison with no colour augmentation.
+
+The test-time perturbation uses a different photometric process from the HSV
+jitter used during training. An exposure change applied in linear light is
+generated differently from the training-time noise. The evaluation therefore
+tests whether the effect of HSV augmentation transfers to that distinct
+process.

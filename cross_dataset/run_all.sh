@@ -3,23 +3,21 @@
 # Sequential on purpose, the runs share one GPU.
 set -euo pipefail
 
-R=/Users/dvkalandadze/projects/final_project
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+R="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 PY="$R/.venv/bin/python"
 cd "$R"
 
-echo "[1/5] fetch (resumes if the archive is already complete)"
+echo "[1/4] fetch (resumes if the archive is already complete)"
 "$PY" cross_dataset/fetch.py
 
-echo "[2/5] prepare both datasets"
+echo "[2/4] prepare both datasets"
 "$PY" cross_dataset/prepare.py
 
-echo "[3/5] train laboro3"
-"$PY" cross_dataset/train_cross.py --dataset laboro3
+echo "[3/4] train laboro3, tomatod, and mix"
+"$PY" cross_dataset/train_cross.py --all
 
-echo "[4/5] train mix"
-"$PY" cross_dataset/train_cross.py --dataset mix
-
-echo "[5/5] evaluate the 3x2 matrix"
+echo "[4/4] evaluate the 3x2 matrix"
 "$PY" cross_dataset/eval_cross.py
 
 echo "DONE"

@@ -11,10 +11,15 @@ targets:
     sources:
       - path: Sources
       # .mlpackage belongs in Compile Sources, not Resources: Xcode's CoreML
-      # compiler turns it into TomatoRipeness.mlmodelc inside the bundle. Listed
-      # as a plain resource it is copied verbatim and the device build finds no
+      # compiler turns each into <name>.mlmodelc inside the bundle. Listed as a
+      # plain resource it is copied verbatim and the device build finds no
       # model at runtime.
-      - path: Resources/TomatoRipeness.mlpackage
+      #
+      # The size ladder (YOLO11n..x, six-class Laboro), one .mlmodelc each, for
+      # the in-app model picker. Git-ignored; filled by sync_models.sh. The
+      # cross_mix export at Resources/TomatoRipeness.mlpackage stays in the repo
+      # for runtime_bench/bench.py but is no longer built into the app.
+      - path: Resources/models
       - path: Resources/samples
         buildPhase: resources
     settings:

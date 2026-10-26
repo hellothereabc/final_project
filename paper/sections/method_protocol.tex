@@ -1,0 +1,82 @@
+\subsection{Datasets and shared taxonomy}
+
+Two public datasets are used (Section~\ref{sec:datasets-bg}). Laboro Tomato
+has 643 training and 161 validation images, photographed at
+3120$\times$4160 or 3024$\times$4032 pixels in portrait or landscape
+orientation. Its six classes combine two fruit sizes (large and small) with
+three maturity stages. tomatOD has 277 images, of which 55 form its validation
+split. Both datasets are used with their own published train/validation
+splits, so no image appears in both training and evaluation.
+
+The class names of both datasets are mapped onto three stages: green,
+half-ripened and fully ripened. The conversion uses class names because the
+numeric class identifiers are inconsistent between the datasets and between
+the splits of tomatOD (Section~\ref{sec:annotation}).
+
+Two preprocessing steps are applied. About 40\% of Laboro images carry an EXIF
+orientation tag. The stored pixels are in landscape orientation, but the
+annotations assume an upright image. The YOLO data loader ignores the tag, so
+the boxes do not align with the fruit. We rotate these images on disk before
+conversion to align the pixels and boxes. This correction reduced the
+ripe-fruit counting MAE of a six-class baseline detector from 0.93 to 0.82. We
+then convert the COCO annotations to the YOLO text format. No other
+preprocessing is done offline. Images are resized on the fly to an input size
+of 640 pixels: at evaluation and inference the longer side is scaled to 640 and
+the image is padded to a 640$\times$640 square, which preserves the aspect
+ratio, while during training the standard Ultralytics augmentations (mosaic,
+scaling, translation, flipping and HSV colour jitter) are applied at the same
+input size.
+
+Three YOLO11n detectors are trained for 60 epochs at 640 pixels, with batch
+size 16, seed 0, and no early stopping. One detector is trained on Laboro, one
+on tomatOD, and one on both datasets. We refer to the detector trained on both
+datasets as the \emph{mixed} model. Each detector is evaluated separately on
+both validation splits.
+
+\subsection{Metrics}
+
+Detection quality is reported as COCO-style box mAP50--95 and mAP50
+(Section~\ref{sec:metrics-bg}). Counting quality is reported as the mean
+absolute error between the predicted and the annotated number of fruit, per
+image and per maturity stage,
+\begin{equation}
+ \mathrm{MAE}_{count} = \frac{1}{3N}\sum_{i=1}^{N}\sum_{s=1}^{3}
+ \left|\hat{c}_{i,s}-c_{i,s}\right|.
+\end{equation}
+Here, $N$ is the number of images and $\hat{c}_{i,s}$ and $c_{i,s}$ are the
+predicted and annotated numbers of fruit of stage $s$ in image $i$. Its unit is
+fruit per image and stage: a counting MAE of 1.25 means that, on average, the
+count for each stage in each image is off by 1.25 fruit. The predicted count is
+the number of detections of that stage above the confidence threshold.
+
+For the occlusion experiments, detections are sorted from highest to lowest
+confidence and paired with annotated boxes without using the maturity labels.
+Each detection and annotation can be paired only once. This greedy matching
+separates detection recall from the stage accuracy of the matched detections.
+Unless stated otherwise, the confidence threshold is 0.25 and the matching
+threshold is IoU 0.5.
+
+\subsection{Colour analysis}
+\label{sec:colour}
+
+The colour of a fruit is measured in the CIELAB colour space, which separates
+lightness ($L^*$) from two colour-opponent axes. The $a^*$ axis runs from green
+(negative values) to red (positive values). It is a dimensionless coordinate
+defined by the CIE \cite{cie2018colorimetry}; it has no formal bound, and for
+colours that an sRGB camera can record it lies roughly between $-90$ and
+$+100$. $a^*$ and the related $a^*/b^*$ ratio are standard colour indices for
+tomato ripening in postharvest science \cite{lopezcamelo2004color}, because
+the change from chlorophyll green to lycopene red moves a fruit mainly along
+this axis.
+
+For each annotated box, we calculate the median $a^*$ in its central half. This
+region excludes most of the stem and leaves at the box edges. We convert the
+pixels from sRGB to CIELAB with the D65 white point. White balance and
+illumination affect the whole image, so we subtract the median $a^*$ of the
+entire frame from every box in that frame. The frame median is dominated by
+foliage, and the resulting value is called background-corrected $a^*$. For each
+dataset, we use grid search to fit two cut points on this axis
+(green\,|\,half and half\,|\,fully). The search maximises balanced accuracy
+against the labels of that dataset. We then apply the cut points from each
+dataset to the boxes from the other dataset. The proportion of labels that
+change measures the disagreement between the annotation conventions.

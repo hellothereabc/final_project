@@ -37,11 +37,37 @@ final class Detector {
     /// Which compute units this instance was built with, for the benchmark screen.
     let computeUnits: MLComputeUnits
 
+    /// The compiled model's name, as `availableModels()` lists it.
+    let modelName: String
+
+    /// Every model compiled into the bundle, by name: the Laboro size ladder
+    /// `YOLO11n`..`YOLO11x` copied in by sync_models.sh, smallest first, then
+    /// anything else alphabetically.
+    static func availableModels() -> [String] {
+        guard let root = Bundle.main.resourceURL,
+              let items = try? FileManager.default.contentsOfDirectory(
+                  at: root, includingPropertiesForKeys: nil)
+        else { return [] }
+        let names = items.filter { $0.pathExtension == "mlmodelc" }
+            .map { $0.deletingPathExtension().lastPathComponent }
+        let ladder = ["YOLO11n", "YOLO11s", "YOLO11m", "YOLO11l", "YOLO11x"]
+        return ladder.filter(names.contains) + names.filter { !ladder.contains($0) }.sorted()
+    }
+
+    /// The model used when nothing is chosen: the smallest, so the CPU default
+    /// still keeps the camera fluid; the picker is there for the rest.
+    static var defaultModelName: String {
+        availableModels().first ?? ""
+    }
+
     /// `computeUnits` defaults to the only setting known to work on both targets;
     /// BenchmarkView passes the others deliberately, one detector each, because
     /// the choice is fixed at load time and cannot be changed per request.
-    init(computeUnits: MLComputeUnits = .cpuOnly) throws {
-        guard let url = Self.findCompiledModel() else { throw DetectorError.modelMissing }
+    /// `modelName` picks one of `availableModels()`; nil means the default.
+    init(modelName: String? = nil, computeUnits: MLComputeUnits = .cpuOnly) throws {
+        let name = modelName ?? Self.defaultModelName
+        guard let url = Self.findCompiledModel(named: name) else { throw DetectorError.modelMissing }
+        self.modelName = name
 
         let config = MLModelConfiguration()
         // The GPU path is unusable for this model on both targets, in two different
@@ -60,8 +86,8 @@ final class Detector {
         let mlModel = try MLModel(contentsOf: url, configuration: config)
         model = try VNCoreMLModel(for: mlModel)
         labels = Self.readLabels(from: mlModel)
-        print(String(format: "[TR] model loaded in %.0f ms, computeUnits=%d, labels=%d",
-                     Date().timeIntervalSince(started) * 1000,
+        print(String(format: "[TR] %@ loaded in %.0f ms, computeUnits=%d, labels=%d",
+                     name, Date().timeIntervalSince(started) * 1000,
                      config.computeUnits.rawValue, labels.count))
     }
 
@@ -114,14 +140,17 @@ final class Detector {
 
     // MARK: - bundle plumbing
 
-    /// Finds the compiled model without hardcoding its name, so swapping in a
-    /// retrained export does not require touching this file.
-    private static func findCompiledModel() -> URL? {
+    /// Xcode compiles every .mlpackage in Compile Sources to `<name>.mlmodelc`
+    /// at the bundle root; a missing name falls back to the first one found, so
+    /// a build with a single renamed export still runs.
+    private static func findCompiledModel(named name: String) -> URL? {
         guard let root = Bundle.main.resourceURL,
               let items = try? FileManager.default.contentsOfDirectory(
                   at: root, includingPropertiesForKeys: nil)
         else { return nil }
-        return items.first { $0.pathExtension == "mlmodelc" }
+        let compiled = items.filter { $0.pathExtension == "mlmodelc" }
+        return compiled.first { $0.deletingPathExtension().lastPathComponent == name }
+            ?? compiled.first
     }
 
     /// ultralytics writes the class list into the model's user-defined metadata.

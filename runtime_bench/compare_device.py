@@ -60,13 +60,15 @@ def main():
                     help="0 reproduces Vision .scaleFit, 114 reproduces training")
     ap.add_argument("--conf", type=float, default=0.25)
     ap.add_argument("--iou", type=float, default=0.45)
+    ap.add_argument("--package", default=str(MLPACKAGE),
+                    help="the .mlpackage the phone ran; default is the app's shipped one")
     args = ap.parse_args()
 
     phone = json.loads(Path(args.phone_json).read_text())
     print(f"phone: {phone.get('device')} / {phone.get('os')}  "
           f"repeats {phone.get('repeats')}")
 
-    runner = CoreMLRunner(MLPACKAGE, args.units, args.conf, args.iou, args.pad)
+    runner = CoreMLRunner(Path(args.package), args.units, args.conf, args.iou, args.pad)
 
     print(f"\n{'latency':<22}{'median ms':>11}{'fps':>8}{'thermal':>12}")
     for config in phone["configs"]:

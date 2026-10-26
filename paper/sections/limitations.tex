@@ -1,0 +1,40 @@
+\section{Limitations}
+\label{sec:limitations}
+
+Training results outside Section~\ref{sec:hsv} use one seed, so differences of
+the order of 0.01 mAP50--95 or 0.02 recall are reported as indistinguishable
+and are not ranked. The colour-augmentation comparison is repeated across three
+seeds because its effect sizes are of that order. The small gains from widening
+the jitter remain close to the spread between retrainings, even where the paired
+test over images distinguishes them. Three seeds provide only a loose bound on
+that spread. They are enough to show that removing the jitter costs an order of
+magnitude more than widening it returns. They are not enough to rank the two
+widened recipes against each other.
+
+Counting error at a tuned threshold is optimistic because each model's
+confidence threshold is selected on the same 161 validation images used to
+report the comparison. There is no separate split for threshold selection. The
+tuned columns in Tables~\ref{tab:ladder} and \ref{tab:ladder-thresh} therefore
+show what each model can reach on these images, not what it would necessarily
+reach on unseen frames. The fixed-threshold columns are reported alongside the
+tuned results. Section~\ref{sec:discussion} uses only conclusions that hold at
+both operating points.
+
+Both principal datasets are public research-greenhouse collections, and no
+held-out field collection has yet been scored. The photometric sweep simulates
+changed light on the existing frames. It does not use images recaptured under
+different lighting and cannot reproduce the sensor noise, motion blur, or
+specular behaviour of a genuinely dark or genuinely over-exposed image.
+Natural occlusion is estimated from box overlap; instance masks would give a
+better area estimate but would still not establish depth order. The synthetic
+strip has an unnatural straight boundary and simultaneously occludes all
+annotated fruit in each frame.
+
+The smartphone timing experiment uses three bundled samples, so it measures
+model inference and not end-to-end live-camera throughput. The GPU compute path
+is excluded because it failed to compile on the device. The size ladder is
+trained only on Laboro and is not directly comparable with the mixed model used
+in the deployment table. It is also trained at one input resolution, leaving
+the trade-off between accuracy, latency, and input size unmeasured. Power is not
+reported because the automated Power Profiler runs ended unreliably and did not
+yield a defensible value \cite{apple2026powerprofiler}.

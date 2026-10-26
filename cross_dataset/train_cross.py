@@ -42,7 +42,7 @@ def run(dataset, args):
         seed=0,
         patience=0,      # all three runs end at the same epoch
         project=str(ROOT / "runs"),
-        name=f"cross_{dataset}",
+        name=args.name or f"cross_{dataset}",
         exist_ok=False,
         val=True,
     )
@@ -53,12 +53,15 @@ def main():
     ap.add_argument("--dataset", choices=list(DATASETS))
     ap.add_argument("--all", action="store_true", help="all three, in order")
     ap.add_argument("--model", default="yolo11n.pt")
+    ap.add_argument("--name", default="", help="run name under runs/ (single dataset only)")
     ap.add_argument("--epochs", type=int, default=60)
     ap.add_argument("--device", default="mps")
     args = ap.parse_args()
 
     if not args.all and not args.dataset:
         ap.error("pass --dataset or --all")
+    if args.all and args.name:
+        ap.error("--name can only be used with --dataset")
 
     for name in (list(DATASETS) if args.all else [args.dataset]):
         run(name, args)

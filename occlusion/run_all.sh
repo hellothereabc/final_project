@@ -3,7 +3,8 @@
 # Sequential on purpose: every step is inference on the one GPU.
 set -euo pipefail
 
-R=/Users/dvkalandadze/projects/final_project
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+R="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 PY="$R/.venv/bin/python"
 cd "$R"
 

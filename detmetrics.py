@@ -73,11 +73,17 @@ class Score:
         self.pred_totals = defaultdict(int)
         self.matched_conf, self.matched_iou = [], []
         self.n_images = 0
+        # Per-image series, for paired tests over images rather than over the
+        # pooled total: (found, gt) per image for recall, and the absolute
+        # counting error per stage per image.
+        self.image_found, self.image_total = [], []
 
     def add(self, gt_stages, gt_boxes, pred_stages, pred_boxes, pred_conf):
         self.n_images += 1
         pairs = match(gt_boxes, pred_boxes, pred_conf, self.iou_threshold)
         ious = iou_matrix(gt_boxes, pred_boxes)
+        self.image_found.append(len(pairs))
+        self.image_total.append(len(gt_stages))
 
         for gt_idx, stage in enumerate(gt_stages):
             self.total[stage] += 1
@@ -117,4 +123,13 @@ class Score:
             "mean_iou": float(np.mean(self.matched_iou)) if self.matched_iou else 0.0,
             "n_gt": n_total,
             "n_images": self.n_images,
+        }
+
+    def per_image(self):
+        """The series a paired bootstrap or a signed-rank test needs: one entry
+        per image, in the order the images were added."""
+        return {
+            "abs_err": {s: [int(e) for e in self.abs_err[s]] for s in STAGES},
+            "found": [int(v) for v in self.image_found],
+            "gt": [int(v) for v in self.image_total],
         }

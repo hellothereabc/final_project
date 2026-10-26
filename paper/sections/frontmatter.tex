@@ -1,0 +1,38 @@
+\begin{abstract}
+Tomato maturity detectors are usually compared using one value: mean average
+precision (mAP) on one dataset. A counting system deployed on an edge device is
+also affected by factors that mAP does not record. These include the annotation
+team, the visible fraction of each fruit, the confidence threshold used to
+produce a count, the lighting, the model size, and the inference hardware. This
+work measures the effect of each factor on YOLO11 detectors trained on two
+public greenhouse datasets, Laboro Tomato and tomatOD. We map both datasets onto
+the same three maturity stages and deploy the detectors with Core ML on the
+Neural Engine of an iPhone~17~Pro. The datasets place the boundary between
+half-ripe and fully ripe fruit at different colours: 98\% of tomatOD's fully
+ripe boxes fall within the colour range that Laboro labels half-ripe. A detector
+trained on both datasets retains its accuracy on each dataset and improves
+transfer in both directions. As a larger fraction of each fruit is hidden,
+detection recall falls from 0.884 to 0.057 at 70\% hidden. Among the fruit still
+detected, the assigned stage is correct for 86\% to 94\% of them. The matching
+rule and the appearance of the occluder each change recall by about ten points.
+Selecting the confidence threshold reduces cross-dataset counting error from
+3.29 to 1.34 fruit per image and stage without changing mAP. Across the five
+YOLO11 sizes trained under one protocol, mAP stops improving at the medium
+model, although package size and latency continue to increase. On the
+smartphone, YOLO11x is the largest size that still runs at 30 frames per second,
+with almost no margin. On a development laptop, the smallest model runs 3.85
+times faster than on the smartphone, while the largest runs only 1.21 times
+faster. Laptop timings therefore overstate the speed advantage of small models.
+Three stops of over-exposure reduce the best model's recall by 0.205. This loss
+is more than three times the 0.058 recall difference between the smallest and
+largest models, and wider training-time colour augmentation does not recover
+it. Reproducing a reported counting error therefore requires the annotation
+source, occlusion and matching rules, confidence threshold, lighting conditions,
+and deployment configuration to be reported.
+\end{abstract}
+
+\begin{IEEEkeywords}
+agricultural computer vision, object detection, tomato ripeness, edge
+inference, on-device deep learning, occlusion, domain shift, calibration,
+illumination robustness, model scaling, Core ML
+\end{IEEEkeywords}

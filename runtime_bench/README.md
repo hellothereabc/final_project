@@ -47,3 +47,20 @@ python runtime_bench/compare_device.py runtime_bench/phone_iPhone18-1.json --pad
 Run the laptop side on an otherwise idle machine. A training job in the
 background inflates the CoreML figure by roughly 50% - the first comparison run
 reported 25.2 ms for CPU-only against 16.4 ms measured idle.
+
+The model-size ladder (YOLO11n through x) is recorded in
+`model_size_results.md`. Its phone reports are
+`phone_iPhone18-1_ios27_yolo11{n,s,m,l,x}_laboro.json` and the sustained
+`..._sustained.json` files; `mac_sanity.py` produces the laptop column and
+`size_thresholds.py` the tuned counting column.
+
+## Unattended phone runs
+
+`phone_bench.sh <size> [repeats] [ane]` does steps 1-3 without touching the
+phone: it swaps the exported package into the app, builds Release with
+`xcodebuild`, installs and launches through `devicectl` with the
+`-autorun-benchmark` launch arguments, polls the app's Documents folder for
+`benchmark.json`, and restores the shipped model. It never overwrites an
+existing report - a device measurement cannot be reproduced later - and names
+files by device, iOS major version, model, and run type. The phone must be
+plugged in, unlocked, and listed as available by `xcrun devicectl list devices`.

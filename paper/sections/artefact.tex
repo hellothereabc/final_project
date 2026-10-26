@@ -1,0 +1,15 @@
+\section{Reproducibility}
+\label{sec:artefact}
+
+The tables and figures in this paper are generated from saved outputs rather
+than transcribed by hand. Training runs write their own metric history, each
+sweep writes a JSON record of every level and threshold, and the smartphone
+benchmark writes a report that is pulled from the device. Non-regenerable
+measurements, particularly smartphone reports, are stored under unique
+filenames and never overwritten. The one such loss that occurred during this
+work is reported beside the measurements it affects.
+
+The companion iOS application bundles the exported ladder, exposes the model
+and compute-unit selection used in Section~\ref{sec:ladder}, and runs the
+benchmark unattended. The reported device measurements therefore come from the
+same build that a user would install.
